@@ -9,142 +9,67 @@ import (
 )
 
 var (
+	// Use
 	numprocsDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_num_procs",
 		"number of processes in this group",
 		[]string{"groupname"},
 		nil)
 
+	// Use
 	cpuSecsDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_cpu_seconds_total",
 		"Cpu user usage in seconds",
 		[]string{"groupname", "mode"},
 		nil)
 
+	// Use
 	readBytesDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_read_bytes_total",
 		"number of bytes read by this group",
 		[]string{"groupname"},
 		nil)
 
+	// Use
 	writeBytesDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_write_bytes_total",
 		"number of bytes written by this group",
 		[]string{"groupname"},
 		nil)
 
-	majorPageFaultsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_major_page_faults_total",
-		"Major page faults",
-		[]string{"groupname"},
-		nil)
-
-	minorPageFaultsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_minor_page_faults_total",
-		"Minor page faults",
-		[]string{"groupname"},
-		nil)
-
-	contextSwitchesDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_context_switches_total",
-		"Context switches",
-		[]string{"groupname", "ctxswitchtype"},
-		nil)
-
+	// Use
 	membytesDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_memory_bytes",
 		"number of bytes of memory in use",
 		[]string{"groupname", "memtype"},
 		nil)
 
-	openFDsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_open_filedesc",
-		"number of open file descriptors for this group",
-		[]string{"groupname"},
-		nil)
-
-	worstFDRatioDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_worst_fd_ratio",
-		"the worst (closest to 1) ratio between open fds and max fds among all procs in this group",
-		[]string{"groupname"},
-		nil)
-
-	startTimeDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_oldest_start_time_seconds",
-		"start time in seconds since 1970/01/01 of oldest process in group",
-		[]string{"groupname"},
-		nil)
-
-	numThreadsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_num_threads",
-		"Number of threads",
-		[]string{"groupname"},
-		nil)
-
-	statesDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_states",
-		"Number of processes in states Running, Sleeping, Waiting, Zombie, or Other",
-		[]string{"groupname", "state"},
-		nil)
-
+	// Technic
 	scrapeErrorsDesc = prometheus.NewDesc(
 		"namedprocess_scrape_errors",
 		"general scrape errors: no proc metrics collected during a cycle",
 		nil,
 		nil)
 
+	// Technic
 	scrapeProcReadErrorsDesc = prometheus.NewDesc(
 		"namedprocess_scrape_procread_errors",
 		"incremented each time a proc's metrics collection fails",
 		nil,
 		nil)
 
+	// Technic
 	scrapePartialErrorsDesc = prometheus.NewDesc(
 		"namedprocess_scrape_partial_errors",
 		"incremented each time a tracked proc's metrics collection fails partially, e.g. unreadable I/O stats",
 		nil,
 		nil)
 
-	threadWchanDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_threads_wchan",
-		"Number of threads in this group waiting on each wchan",
-		[]string{"groupname", "wchan"},
-		nil)
-
-	threadCountDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_thread_count",
-		"Number of threads in this group with same threadname",
-		[]string{"groupname", "threadname"},
-		nil)
-
+	// Use
 	threadCpuSecsDesc = prometheus.NewDesc(
 		"namedprocess_namegroup_thread_cpu_seconds_total",
 		"Cpu user/system usage in seconds",
 		[]string{"groupname", "threadname", "mode"},
-		nil)
-
-	threadIoBytesDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_thread_io_bytes_total",
-		"number of bytes read/written by these threads",
-		[]string{"groupname", "threadname", "iomode"},
-		nil)
-
-	threadMajorPageFaultsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_thread_major_page_faults_total",
-		"Major page faults for these threads",
-		[]string{"groupname", "threadname"},
-		nil)
-
-	threadMinorPageFaultsDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_thread_minor_page_faults_total",
-		"Minor page faults for these threads",
-		[]string{"groupname", "threadname"},
-		nil)
-
-	threadContextSwitchesDesc = prometheus.NewDesc(
-		"namedprocess_namegroup_thread_context_switches_total",
-		"Context switches for these threads",
-		[]string{"groupname", "threadname", "ctxswitchtype"},
 		nil)
 )
 
@@ -216,24 +141,10 @@ func (p *NamedProcessCollector) Describe(ch chan<- *prometheus.Desc) {
 	ch <- readBytesDesc
 	ch <- writeBytesDesc
 	ch <- membytesDesc
-	ch <- openFDsDesc
-	ch <- worstFDRatioDesc
-	ch <- startTimeDesc
-	ch <- majorPageFaultsDesc
-	ch <- minorPageFaultsDesc
-	ch <- contextSwitchesDesc
-	ch <- numThreadsDesc
-	ch <- statesDesc
 	ch <- scrapeErrorsDesc
 	ch <- scrapeProcReadErrorsDesc
 	ch <- scrapePartialErrorsDesc
-	ch <- threadWchanDesc
-	ch <- threadCountDesc
 	ch <- threadCpuSecsDesc
-	ch <- threadIoBytesDesc
-	ch <- threadMajorPageFaultsDesc
-	ch <- threadMinorPageFaultsDesc
-	ch <- threadContextSwitchesDesc
 }
 
 // Collect implements prometheus.Collector.
@@ -267,12 +178,6 @@ func (p *NamedProcessCollector) scrape(ch chan<- prometheus.Metric) {
 				prometheus.GaugeValue, float64(gcounts.Memory.VirtualBytes), gname, "virtual")
 			ch <- prometheus.MustNewConstMetric(membytesDesc,
 				prometheus.GaugeValue, float64(gcounts.Memory.VmSwapBytes), gname, "swapped")
-			ch <- prometheus.MustNewConstMetric(startTimeDesc,
-				prometheus.GaugeValue, float64(gcounts.OldestStartTime.Unix()), gname)
-			ch <- prometheus.MustNewConstMetric(openFDsDesc,
-				prometheus.GaugeValue, float64(gcounts.OpenFDs), gname)
-			ch <- prometheus.MustNewConstMetric(worstFDRatioDesc,
-				prometheus.GaugeValue, float64(gcounts.WorstFDratio), gname)
 			ch <- prometheus.MustNewConstMetric(cpuSecsDesc,
 				prometheus.CounterValue, gcounts.CPUUserTime, gname, "user")
 			ch <- prometheus.MustNewConstMetric(cpuSecsDesc,
@@ -281,31 +186,6 @@ func (p *NamedProcessCollector) scrape(ch chan<- prometheus.Metric) {
 				prometheus.CounterValue, float64(gcounts.ReadBytes), gname)
 			ch <- prometheus.MustNewConstMetric(writeBytesDesc,
 				prometheus.CounterValue, float64(gcounts.WriteBytes), gname)
-			ch <- prometheus.MustNewConstMetric(majorPageFaultsDesc,
-				prometheus.CounterValue, float64(gcounts.MajorPageFaults), gname)
-			ch <- prometheus.MustNewConstMetric(minorPageFaultsDesc,
-				prometheus.CounterValue, float64(gcounts.MinorPageFaults), gname)
-			ch <- prometheus.MustNewConstMetric(contextSwitchesDesc,
-				prometheus.CounterValue, float64(gcounts.CtxSwitchVoluntary), gname, "voluntary")
-			ch <- prometheus.MustNewConstMetric(contextSwitchesDesc,
-				prometheus.CounterValue, float64(gcounts.CtxSwitchNonvoluntary), gname, "nonvoluntary")
-			ch <- prometheus.MustNewConstMetric(numThreadsDesc,
-				prometheus.GaugeValue, float64(gcounts.NumThreads), gname)
-			ch <- prometheus.MustNewConstMetric(statesDesc,
-				prometheus.GaugeValue, float64(gcounts.States.Running), gname, "Running")
-			ch <- prometheus.MustNewConstMetric(statesDesc,
-				prometheus.GaugeValue, float64(gcounts.States.Sleeping), gname, "Sleeping")
-			ch <- prometheus.MustNewConstMetric(statesDesc,
-				prometheus.GaugeValue, float64(gcounts.States.Waiting), gname, "Waiting")
-			ch <- prometheus.MustNewConstMetric(statesDesc,
-				prometheus.GaugeValue, float64(gcounts.States.Zombie), gname, "Zombie")
-			ch <- prometheus.MustNewConstMetric(statesDesc,
-				prometheus.GaugeValue, float64(gcounts.States.Other), gname, "Other")
-
-			for wchan, count := range gcounts.Wchans {
-				ch <- prometheus.MustNewConstMetric(threadWchanDesc,
-					prometheus.GaugeValue, float64(count), gname, wchan)
-			}
 
 			if p.smaps {
 				ch <- prometheus.MustNewConstMetric(membytesDesc,
@@ -316,33 +196,12 @@ func (p *NamedProcessCollector) scrape(ch chan<- prometheus.Metric) {
 
 			if p.threads {
 				for _, thr := range gcounts.Threads {
-					ch <- prometheus.MustNewConstMetric(threadCountDesc,
-						prometheus.GaugeValue, float64(thr.NumThreads),
-						gname, thr.Name)
 					ch <- prometheus.MustNewConstMetric(threadCpuSecsDesc,
 						prometheus.CounterValue, float64(thr.CPUUserTime),
 						gname, thr.Name, "user")
 					ch <- prometheus.MustNewConstMetric(threadCpuSecsDesc,
 						prometheus.CounterValue, float64(thr.CPUSystemTime),
 						gname, thr.Name, "system")
-					ch <- prometheus.MustNewConstMetric(threadIoBytesDesc,
-						prometheus.CounterValue, float64(thr.ReadBytes),
-						gname, thr.Name, "read")
-					ch <- prometheus.MustNewConstMetric(threadIoBytesDesc,
-						prometheus.CounterValue, float64(thr.WriteBytes),
-						gname, thr.Name, "write")
-					ch <- prometheus.MustNewConstMetric(threadMajorPageFaultsDesc,
-						prometheus.CounterValue, float64(thr.MajorPageFaults),
-						gname, thr.Name)
-					ch <- prometheus.MustNewConstMetric(threadMinorPageFaultsDesc,
-						prometheus.CounterValue, float64(thr.MinorPageFaults),
-						gname, thr.Name)
-					ch <- prometheus.MustNewConstMetric(threadContextSwitchesDesc,
-						prometheus.CounterValue, float64(thr.CtxSwitchVoluntary),
-						gname, thr.Name, "voluntary")
-					ch <- prometheus.MustNewConstMetric(threadContextSwitchesDesc,
-						prometheus.CounterValue, float64(thr.CtxSwitchNonvoluntary),
-						gname, thr.Name, "nonvoluntary")
 				}
 			}
 		}
