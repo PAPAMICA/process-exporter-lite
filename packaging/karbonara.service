@@ -1,10 +1,10 @@
 [Unit]
-Description=Process Exporter for Prometheus
+Description=Karbonara
 
 [Service]
 User=root
 Type=simple
-EnvironmentFile=-/etc/default/process-exporter
+EnvironmentFile=-/etc/default/karbonara
 ExecStart=/usr/bin/process-exporter $OPTS
 KillMode=process
 Restart=always
