@@ -1,2 +1,2 @@
 # process-exporter startup flags
-OPTS='--config.path /etc/process-exporter/config.yml --web.config.file /etc/process-exporter/auth.yml --removeEmptyGroups true --web.listen-address=:13996'
+OPTS='--config.path /etc/karbonara/config.yml --web.config.file /etc/karbonara/auth.yml --removeEmptyGroups true --web.listen-address=:13996'

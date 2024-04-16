@@ -1,4 +1,6 @@
 process_names:
-  - name: "{{.Comm}}"
-    cmdline: 
-    - '.+'
+  - name: "[{{.Username}}]{{.ExeFull}}"
+    comm:
+    - php-fpm
+    - process-exporte
+    - mariadb

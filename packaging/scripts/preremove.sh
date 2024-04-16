@@ -1,2 +1,2 @@
-systemctl stop process-exporter.service
-systemctl disable process-exporter.service
+systemctl stop karbonara.service
+systemctl disable karbonara.service

@@ -39,13 +39,13 @@ nfpms:
       - src: packaging/process-exporter.service
         dst: /lib/systemd/system/process-exporter.service
       - src: packaging/conf/config.yml
-        dst: /etc/process-exporter/config.yml
+        dst: /etc/karbonara/config.yml
         type: config
       - src: packaging/conf/auth.yml
-        dst: /etc/process-exporter/auth.yml
+        dst: /etc/karbonara/auth.yml
         type: config
       - src: packaging/default/process-exporter
-        dst: /etc/default/process-exporter
+        dst: /etc/default/karbonara
         type: config
 
     scripts:

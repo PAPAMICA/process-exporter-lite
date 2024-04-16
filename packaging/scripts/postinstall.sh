@@ -1,3 +1,3 @@
 systemctl daemon-reload
-systemctl enable process-exporter.service
-systemctl restart process-exporter.service
+systemctl enable karbonara.service
+systemctl restart karbonara.service
